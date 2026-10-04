@@ -184,14 +184,44 @@ function Materialize($Manifest, $Entry, [string]$TargetRoot) {
     Write-Host "[PackageSet] Materialized $($validated.Identity) @ $($validated.Revision)"
 }
 
+function Assert-ProjectionMatchesSource($Entry, $Validated) {
+    if (-not (Test-Path -LiteralPath $Validated.ProjectionPath -PathType Container)) {
+        Fail "$($Validated.Identity): distribution projection is missing: $($Validated.ProjectionPath)"
+    }
+
+    $projectionItem = Get-Item -LiteralPath $Validated.ProjectionPath -Force
+    if (($projectionItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+        Fail "$($Validated.Identity): projection is already a reparse point. Return to distribution mode first."
+    }
+
+    $provenancePath = Join-Path $Validated.ProjectionPath ".packageset-provenance.json"
+    if (-not (Test-Path -LiteralPath $provenancePath -PathType Leaf)) {
+        Fail "$($Validated.Identity): projection provenance is missing: $provenancePath"
+    }
+
+    $provenance = Get-Content -LiteralPath $provenancePath -Raw | ConvertFrom-Json
+    if ([string]$provenance.identity -ne [string]$Entry.identity) {
+        Fail "$($Validated.Identity): projection identity does not match the PackageSet entry."
+    }
+    if ([string]$provenance.sourceRevision -ne [string]$Validated.Revision) {
+        Fail "$($Validated.Identity): projection revision $($provenance.sourceRevision) does not match source revision $($Validated.Revision). Materialize first."
+    }
+}
+
 function Use-Development($Manifest, $Entry, [string]$TargetRoot) {
-    $validated = Assert-EntryValid $Manifest $Entry $TargetRoot
+    $validated = Assert-EntryValid $Manifest $Entry $TargetRoot -RequireClean
+    Assert-ProjectionMatchesSource $Entry $validated
+
     $parent = Split-Path -Parent $validated.ProjectionPath
     New-Item -ItemType Directory -Path $parent -Force | Out-Null
     Remove-Projection $validated.ProjectionPath
+
     & cmd /c mklink /J "$($validated.ProjectionPath)" "$($validated.SourcePath)" | Out-Null
     if ($LASTEXITCODE -ne 0) { Fail "$($validated.Identity): failed to create development junction." }
+
     Write-Host "[PackageSet] Development source active: $($validated.Identity)"
+    Write-Host "  projection: $($validated.ProjectionPath)"
+    Write-Host "  source:     $($validated.SourcePath)"
 }
 
 $manifest = Read-Manifest
