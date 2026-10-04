@@ -32,15 +32,16 @@ UPM is reserved for public repositories and will be evaluated separately.
 
 ## Repository placement
 
-For the simplest local experiment, clone the repositories as siblings:
+For this experiment, keep the PackageSet checkout inside the Unity project root:
 
 ```text
-<root>/
-  Learn.PackageManager/
+Learn.PackageManager/
+  Assets/
+  ProjectSettings/
   Learn.PackageSet.PackageManager/
 ```
 
-The manifest currently points to `../Learn.PackageManager`.
+The nested PackageSet directory is local development state and is ignored by the Unity project repository. The manifest points to `..`, which resolves to the containing Unity project root.
 
 ## Add the first private source
 
