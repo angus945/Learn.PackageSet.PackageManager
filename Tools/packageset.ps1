@@ -81,7 +81,7 @@ function Get-ProjectionPath($Manifest, $Entry, [string]$TargetRoot) {
 }
 
 function Get-SubmoduleStatus([string]$SourceRelativePath) {
-    $lines = Invoke-Git @("submodule", "status", "--", $SourceRelativePath)
+    $lines = @(Invoke-Git @("submodule", "status", "--", $SourceRelativePath))
     if ($lines.Count -ne 1) { Fail "Expected one submodule status line for $SourceRelativePath." }
     $line = [string]$lines[0]
     if ($line.Length -lt 41) { Fail "Unexpected submodule status for ${SourceRelativePath}: $line" }
@@ -107,13 +107,15 @@ function Assert-EntryValid($Manifest, $Entry, [string]$TargetRoot, [switch]$Requ
         default { Fail "${identity}: unsupported submodule status $($status.Prefix)." }
     }
 
-    $head = ((Invoke-Git @("rev-parse", "HEAD") $sourcePath)[0]).Trim()
+    $headLines = @(Invoke-Git @("rev-parse", "HEAD") $sourcePath)
+    if ($headLines.Count -ne 1) { Fail "${identity}: expected one HEAD revision line." }
+    $head = ([string]$headLines[0]).Trim()
     if ($head -ne $status.Revision) {
         Fail "${identity}: checkout HEAD $head does not match gitlink $($status.Revision)."
     }
 
     if ($RequireClean) {
-        $dirty = Invoke-Git @("status", "--porcelain") $sourcePath
+        $dirty = @(Invoke-Git @("status", "--porcelain") $sourcePath)
         if ($dirty.Count -gt 0) {
             Fail "${identity}: source working tree is dirty. Commit or revert changes before materialization."
         }
@@ -146,7 +148,9 @@ function Copy-SourceProjection([string]$SourcePath, [string]$ProjectionPath) {
 }
 
 function Write-Provenance($Entry, $Validated) {
-    $sourceUrl = ((Invoke-Git @("remote", "get-url", "origin") $Validated.SourcePath)[0]).Trim()
+    $sourceUrlLines = @(Invoke-Git @("remote", "get-url", "origin") $Validated.SourcePath)
+    if ($sourceUrlLines.Count -ne 1) { Fail "$($Validated.Identity): expected one origin URL." }
+    $sourceUrl = ([string]$sourceUrlLines[0]).Trim()
     $provenance = [ordered]@{
         schemaVersion = 1
         identity = [string]$Entry.identity
@@ -180,7 +184,7 @@ function Use-Development($Manifest, $Entry, [string]$TargetRoot) {
 
 $manifest = Read-Manifest
 $targetRoot = Resolve-TargetRoot $manifest
-$entries = Get-Entries $manifest
+$entries = @(Get-Entries $manifest)
 
 if ($entries.Count -eq 0) {
     Write-Host "[PackageSet] Manifest is valid but contains no managed entries yet."
