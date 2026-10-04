@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "target": {
+    "identity": "Project.Learn.PackageManager",
+    "repository": "angus945/Learn.PackageManager",
+    "unityProjectRelativePath": "../Learn.PackageManager"
+  },
+  "managedProjectionRoot": "Assets/CraftyRacoon/Managed",
+  "entries": []
+}
