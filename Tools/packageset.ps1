@@ -84,7 +84,7 @@ function Get-SubmoduleStatus([string]$SourceRelativePath) {
     $lines = Invoke-Git @("submodule", "status", "--", $SourceRelativePath)
     if ($lines.Count -ne 1) { Fail "Expected one submodule status line for $SourceRelativePath." }
     $line = [string]$lines[0]
-    if ($line.Length -lt 41) { Fail "Unexpected submodule status for $SourceRelativePath: $line" }
+    if ($line.Length -lt 41) { Fail "Unexpected submodule status for ${SourceRelativePath}: $line" }
     return @{ Prefix = $line.Substring(0, 1); Revision = $line.Substring(1, 40); Raw = $line }
 }
 
@@ -95,27 +95,27 @@ function Assert-EntryValid($Manifest, $Entry, [string]$TargetRoot, [switch]$Requ
     $projectionPath = Get-ProjectionPath $Manifest $Entry $TargetRoot
 
     if (-not (Test-Path -LiteralPath $sourcePath -PathType Container)) {
-        Fail "$identity: source checkout is missing: $sourcePath"
+        Fail "${identity}: source checkout is missing: $sourcePath"
     }
 
     $status = Get-SubmoduleStatus $sourceRelative
     switch ($status.Prefix) {
         " " { }
-        "-" { Fail "$identity: submodule is declared but not initialized." }
-        "+" { Fail "$identity: submodule checkout does not match the PackageSet gitlink." }
-        "U" { Fail "$identity: submodule gitlink is conflicted." }
-        default { Fail "$identity: unsupported submodule status $($status.Prefix)." }
+        "-" { Fail "${identity}: submodule is declared but not initialized." }
+        "+" { Fail "${identity}: submodule checkout does not match the PackageSet gitlink." }
+        "U" { Fail "${identity}: submodule gitlink is conflicted." }
+        default { Fail "${identity}: unsupported submodule status $($status.Prefix)." }
     }
 
     $head = ((Invoke-Git @("rev-parse", "HEAD") $sourcePath)[0]).Trim()
     if ($head -ne $status.Revision) {
-        Fail "$identity: checkout HEAD $head does not match gitlink $($status.Revision)."
+        Fail "${identity}: checkout HEAD $head does not match gitlink $($status.Revision)."
     }
 
     if ($RequireClean) {
         $dirty = Invoke-Git @("status", "--porcelain") $sourcePath
         if ($dirty.Count -gt 0) {
-            Fail "$identity: source working tree is dirty. Commit or revert changes before materialization."
+            Fail "${identity}: source working tree is dirty. Commit or revert changes before materialization."
         }
     }
 
