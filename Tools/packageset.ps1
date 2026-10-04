@@ -138,7 +138,7 @@ function Copy-SourceProjection([string]$SourcePath, [string]$ProjectionPath) {
     Remove-Projection $temp
     New-Item -ItemType Directory -Path $temp -Force | Out-Null
 
-    & robocopy $SourcePath $temp /MIR /XD .git /XF .packageset-provenance.json /NFL /NDL /NJH /NJS /NP | Out-Null
+    & robocopy $SourcePath $temp /MIR /XD .git /XF .git .packageset-provenance.json /NFL /NDL /NJH /NJS /NP | Out-Null
     if ($LASTEXITCODE -ge 8) { Fail "robocopy failed with exit code $LASTEXITCODE." }
 
     Remove-Projection $ProjectionPath
