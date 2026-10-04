@@ -129,3 +129,43 @@ This is an experiment, not an accepted final implementation. Record Unity AssetD
 The architecture is viable if canonical private source ownership, exact-revision materialization, distribution independence, and clean source provenance all pass.
 
 A junction failure only rejects that development-switch implementation; it does not reject PackageSet itself.
+
+
+## Development-mode Git semantics
+
+Development mode deliberately replaces the committed physical projection with an NTFS junction to the canonical source checkout.
+
+While that junction is active:
+
+- the source repository remains the only reusable source commit authority;
+- the Unity project repository may report managed files as modified, deleted, or untracked;
+- that Unity-project dirty state is expected because its index still represents the committed distribution snapshot while the filesystem exposes live development source;
+- do not stage or commit managed projection changes from the Unity project while development mode is active;
+- Unity-generated metadata inside the source checkout is governed by the source repository's Unity/.gitignore policy.
+
+The important invariant is convergence, not a clean Project working tree during development:
+
+```text
+development source change
+    -> source commit
+    -> PackageSet gitlink advance
+    -> use-distribution
+    -> exact-revision materialization
+    -> review/commit Project distribution diff
+```
+
+A valid lifecycle ends with the physical distribution projection matching the PackageSet gitlink revision and no junction remaining.
+
+## Full lifecycle gate
+
+1. Start from a committed distribution projection.
+2. Switch to `use-development`.
+3. Modify canonical source and verify Unity consumes the change immediately.
+4. Commit and push the canonical source change.
+5. In the PackageSet repository, stage the submodule gitlink change and commit it.
+6. Run `validate`; it must resolve the new exact revision.
+7. Run `use-distribution`; it must replace the junction with a physical projection from the clean exact revision.
+8. Verify the Unity project still compiles.
+9. Verify Project Git now shows only the intended materialized distribution diff.
+10. Commit the Project projection update.
+11. Fresh-clone the Project only and verify it works without PackageSet/private-source access.
