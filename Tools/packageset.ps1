@@ -42,7 +42,19 @@ function Resolve-TargetRoot($Manifest) {
     if (-not (Test-Path -LiteralPath $path -PathType Container)) {
         Fail "Unity target root does not exist: $path"
     }
-    return (Resolve-Path -LiteralPath $path).Path
+
+    $resolved = (Resolve-Path -LiteralPath $path).Path
+    $projectVersion = Join-Path $resolved "ProjectSettings/ProjectVersion.txt"
+    $assetsDirectory = Join-Path $resolved "Assets"
+
+    if (-not (Test-Path -LiteralPath $projectVersion -PathType Leaf)) {
+        Fail "Configured target is not a Unity project root (missing ProjectSettings/ProjectVersion.txt): $resolved"
+    }
+    if (-not (Test-Path -LiteralPath $assetsDirectory -PathType Container)) {
+        Fail "Configured target is not a Unity project root (missing Assets directory): $resolved"
+    }
+
+    return $resolved
 }
 
 function Get-Entries($Manifest) {
