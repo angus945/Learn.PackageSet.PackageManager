@@ -3,7 +3,7 @@
   "target": {
     "identity": "Project.Learn.PackageManager",
     "repository": "angus945/Learn.PackageManager",
-    "unityProjectRelativePath": ".."
+    "unityProjectRelativePath": "../Learn.PackageManager"
   },
   "managedProjectionRoot": "Assets/CraftyRacoon/Managed",
   "entries": [
