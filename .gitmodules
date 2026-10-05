@@ -1,3 +1,12 @@
-[submodule "Sources/Workspace.Verification"]
-	path = Sources/Workspace.Verification
+[submodule "Sources/Workspaces/Workspace.Verification"]
+	path = Sources/Workspaces/Workspace.Verification
 	url = https://github.com/crafty-racoon/Workspace.Verification.git
+[submodule "Sources/Modules/Module.PackageManagement"]
+	path = Sources/Modules/Module.PackageManagement
+	url = https://github.com/crafty-racoon/Module.PackageManagement.git
+[submodule "Sources/Frameworks/Framework.PackageManagement"]
+	path = Sources/Frameworks/Framework.PackageManagement
+	url = https://github.com/crafty-racoon/Framework.PackageManagement.git
+[submodule "Sources/Frameworks/Framework.PackageManagement.Unity3D"]
+	path = Sources/Frameworks/Framework.PackageManagement.Unity3D
+	url = https://github.com/crafty-racoon/Framework.PackageManagement.Unity3D.git

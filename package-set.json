@@ -1,16 +1,40 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "identity": "PackageSet.Learn.PackageManager",
   "target": {
     "identity": "Project.Learn.PackageManager",
-    "repository": "angus945/Learn.PackageManager",
-    "unityProjectRelativePath": "../Learn.PackageManager"
+    "repository": "angus945/Learn.PackageManager"
   },
+  "sourceRoot": "Sources",
   "managedProjectionRoot": "Assets/CraftyRacoon/Managed",
   "entries": [
     {
       "identity": "Workspace.Verification",
-      "sourcePath": "Sources/Workspace.Verification",
-      "projectionName": "Workspace.Verification"
+      "sourcePath": "Sources/Workspaces/Workspace.Verification",
+      "projectionPath": "Workspaces/Workspace.Verification",
+      "kind": "GitSubmodule",
+      "bootstrapRuntime": false
+    },
+    {
+      "identity": "Module.PackageManagement",
+      "sourcePath": "Sources/Modules/Module.PackageManagement",
+      "projectionPath": "Modules/Module.PackageManagement",
+      "kind": "GitSubmodule",
+      "bootstrapRuntime": true
+    },
+    {
+      "identity": "Framework.PackageManagement",
+      "sourcePath": "Sources/Frameworks/Framework.PackageManagement",
+      "projectionPath": "Frameworks/Framework.PackageManagement",
+      "kind": "GitSubmodule",
+      "bootstrapRuntime": true
+    },
+    {
+      "identity": "Framework.PackageManagement.Unity3D",
+      "sourcePath": "Sources/Frameworks/Framework.PackageManagement.Unity3D",
+      "projectionPath": "Frameworks/Framework.PackageManagement.Unity3D",
+      "kind": "GitSubmodule",
+      "bootstrapRuntime": true
     }
   ]
 }
